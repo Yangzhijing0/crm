@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>用户列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="resources/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+
+<!--给用户分配角色的弹出层-->
+<div style="padding: 10px;"  id="selectUserRoleDiv">
+    <table class="layui-hide" id="roleTable" lay-filter="roleTable"></table>
+    <input type="hidden" id="userIdHiden"></input>
+    <button type="button" class="layui-btn" id="assignRoleBtn">分配角色</button>
+</div>
+<script type="text/javascript" src="resources/layui/layui.js"></script>
+<script th:inline="none">
+    layui.use(['form','layer','laydate','table','laytpl'],function(){
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : top.layer,
+            $ = layui.jquery,
+            laydate = layui.laydate,
+            laytpl = layui.laytpl,
+            table = layui.table;
+        var uuid=$("#userIdHiden").val();
+        //用户列表
+        var tableIns = table.render({
+            elem: '#roleTable',
+            url : 'users/initRolesByUid',
+            page : false,
+            id : "rolesListTable",
+            where:{
+                uid:uuid
+            },
+            cols : [[
+                {type: "checkbox", fixed:"left", width:50},
+                {field: 'rolename', title: '角色名', align:"center"}
+            ]]
+        });
+
+        //重新分配角色
+        $("#assignRoleBtn").click(function () {
+            var checkStatus = table.checkStatus('rolesListTable');
+            var data = checkStatus.data;
+            var rIds = [];
+            if(data.length > 0) {
+                for (var i in data) {
+                    rIds.push(data[i].id);
+                }
+            }
+            $.ajax({
+                type:"GET",
+                url:"users/grantRole.do",
+                data:{uid:uuid,rids:rIds},
+                success:function (res) {
+                    if(res.code=2002){
+                        var index1=parent.layer.getFrameIndex(window.name)
+                        parent.layer.close(index1);
+                        layer.msg(res.msg);
+                    }else if(res.code=-2002){
+                        layer.msg(res.msg);
+                    }
+                }
+
+            });
+        });
+
+    })
+
+</script>
+</body>
+</html>

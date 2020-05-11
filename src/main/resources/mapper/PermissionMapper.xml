@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniuxy.dao.PermssionMapper">
+    <resultMap id="permissionMapper" type="Permission">
+        <id property="id" column="id"></id>
+        <result property="pid" column="pid"></result>
+        <result property="type" column="type"></result>
+        <result property="name" column="name"></result>
+        <result property="icon" column="icon"></result>
+        <result property="href" column="href"></result>
+        <result property="open" column="open"></result>
+        <collection property="roles"
+                    select="com.woniuxy.dao.RoleMapper.selectRolesByPerid"
+                    column="id">
+        </collection>
+    </resultMap>
+    <select id="selectAllPermissions" resultMap="permissionMapper">
+         SELECT * FROM sys_permission
+    </select>
+    <select id="selectPermissionsByRid" parameterType="int" resultType="Permission">
+        SELECT * FROM sys_permission WHERE id IN(
+          (SELECT perid FROM sys_role_permission WHERE rid=#{rid})
+        )
+    </select>
+    <select id="selectPercodesByUid" parameterType="int" resultType="string">
+        SELECT per.percode
+        FROM sys_user_role ur,sys_role_permission rp,sys_permission per
+        WHERE ur.rid=rp.rid AND rp.perid=per.id AND per.type='permission' AND ur.uid=#{uid}
+    </select>
+    <select id="selectMenusByUid" parameterType="int" resultType="permission">
+        SELECT DISTINCT per.*
+        FROM sys_user_role ur,sys_role_permission rp,sys_permission per
+        WHERE ur.rid=rp.rid AND rp.perid=per.id AND per.TYPE='menu' AND ur.uid=#{uid}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,58 @@
+spring:
+  #\u6570\u636E\u6E90\u914D\u7F6E
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/crm?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT1FROMDUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    logSlowSql: true
+  #thymeleaf\u914D\u7F6E
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+  #\u70ED\u90E8\u7F72\u7684\u914D\u7F6E
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+#mybatis\u7684\u914D\u7F6E
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.woniuxy.pojo
+#\u65E5\u5FD7\u7684\u8BBE\u7F6E
+logging:
+  level:
+    com:
+      woniuxy: debug
+shiro:
+  hash-algorithm-name: md5
+  hash-iterations: 1024
+  login-url: /login.html
+  unauthorized-url: /login.html
+  anon-urls:
+    - /login.html
+    - /login.do
+    - /resources/**
+    - /zTree_v3/**
+  authc-urls:
+    - /**
+server:
+  port: 8081
+pagehelper:
+  helper-dialect: mysql
+
+

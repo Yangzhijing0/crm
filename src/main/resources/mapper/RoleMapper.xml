@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniuxy.dao.RoleMapper">
+    <resultMap id="roleMap" type="role">
+        <id property="id" column="id"></id>
+        <result property="rolename" column="rolename"></result>
+        <collection property="users"
+                    select="com.woniuxy.dao.UserMapper.selectUsersByRid"
+                    column="id">
+        </collection>
+        <collection property="permissions"
+                     select="com.woniuxy.dao.PermssionMapper.selectPermissionsByRid"
+                     column="id">
+        </collection>
+    </resultMap>
+    <select id="selectRolesByUid" resultType="role" parameterType="int">
+       SELECT * FROM sys_role WHERE id IN(
+          (SELECT rid FROM sys_user_role WHERE uid=#{uid})
+       )
+    </select>
+
+    <select id="selectAllRoles" resultMap="roleMap">
+        SELECT * FROM sys_role
+    </select>
+
+    <select id="selectRolesByPerid" parameterType="int" resultType="role">
+        SELECT * FROM sys_role WHERE id IN(
+          (SELECT rid FROM sys_role_permission WHERE perid=#{perid})
+        )
+    </select>
+    <select id="selectRoleNamesByUid" parameterType="int" resultType="string">
+        SELECT r.rolename
+        FROM sys_user_role ur INNER JOIN sys_role r ON ur.rid=r.id
+        WHERE ur.uid=#{uid}
+    </select>
+
+    <insert id="insertRolePermission">
+        INSERT INTO sys_role_permission(rid,perid)VALUES(#{rid},#{perid})
+    </insert>
+    <delete id="deleteRolePermission" parameterType="int">
+        DELETE FROM sys_role_permission where rid=#{rid}
+    </delete>
+</mapper>

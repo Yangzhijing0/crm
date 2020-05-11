@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniuxy.dao.UserMapper">
+    <resultMap id="userMap" type="user">
+        <id property="id" column="id"></id>
+        <result property="telephone" column="telephone"></result>
+        <result property="realname" column="realname"></result>
+        <result property="birthday" column="birthday"></result>
+        <result property="headimg" column="headimg"></result>
+        <result property="available" column="available"></result>
+        <association property="dept"
+                     select="com.woniuxy.dao.DeptMapper.selectDeptBynoStep"
+                     column="did">
+        </association>
+        <collection property="roles"
+                    select="com.woniuxy.dao.RoleMapper.selectRolesByUid"
+                    column="id">
+        </collection>
+    </resultMap>
+    <select id="selectAllUsers" resultMap="userMap">
+        SELECT * FROM sys_user
+    </select>
+    <select id="selectUsersByRid" parameterType="int" resultType="user">
+        SELECT * FROM sys_user WHERE id IN(
+          (SELECT uid FROM sys_user_role WHERE rid=#{rid})
+        )
+    </select>
+    <select id="selectUsersByDid" parameterType="int" resultType="user">
+        SELECT * FROM sys_user WHERE did=#{did}
+    </select>
+    <select id="selectUserByTelAndPwd" resultType="user">
+        SELECT * FROM sys_user WHERE telephone=#{telephone} AND password=#{password}
+    </select>
+    <insert id="insertSysUser" parameterType="user" useGeneratedKeys="true" keyProperty="id">
+         INSERT INTO sys_user(telephone,password,realname,birthday,headimg,available,did)
+         VALUES(#{telephone},#{password},#{realname},#{birthday},#{headimg},#{available},#{dept.id})
+    </insert>
+    <insert id="insertSysUserRole">
+        INSERT INTO sys_user_role(uid,rid)VALUES(#{uid},#{rid})
+    </insert>
+    <select id="selectUserByTel" parameterType="string" resultType="user">
+        SELECT * FROM sys_user WHERE telephone=#{telephone}
+    </select>
+    <select id="selectUsersByCondition" parameterType="user" resultMap="userMap">
+         SELECT * FROM sys_user
+         <where>
+             <if test="realname!=null and realname!=''">
+                AND realname LIKE concat('%',#{realname},'%')
+             </if>
+         </where>
+    </select>
+    <delete id="deleteUserById" parameterType="int">
+        DELETE FROM sys_user WHERE id=#{id}
+    </delete>
+    <delete id="deleteUserRoleByUid" parameterType="int">
+        DELETE FROM sys_user_role WHERE uid=#{uid}
+    </delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
